@@ -57,7 +57,7 @@ dataset/
 # Update dataset path in Cell 1
 DATASET_PATH = "path/to/your/dataset"
 # Execute all cells in order:
-# 1. Data Loading → 2. HOG → 3. LBP → 4. PCA → 5. Training → 6. Visualization → 7. Prediction
+1. Data Loading → 2. HOG → 3. LBP → 4. PCA → 5. Training → 6. Visualization → 7. Prediction
 
 4. Predict on New Images
 predicted_name = predict_person(
@@ -69,11 +69,11 @@ predicted_name = predict_person(
 )
 print(f"Predicted: {predicted_name}")
 
-🛠 Dependencies
+#🛠 Dependencies
 Python 3.7+
 scikit-learn, scikit-image, numpy, matplotlib, Pillow
 
-🎯Why This Project?
+#🎯Why This Project?
 Demonstrates traditional ML (non-deep-learning) for face recognition.
 Educational: Clear workflow for beginners in computer vision.
 
