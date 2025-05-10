@@ -69,26 +69,13 @@ predicted_name = predict_person(
 )
 print(f"Predicted: {predicted_name}")
 
-#🛠 Dependencies
+🛠 #Dependencies
 Python 3.7+
 scikit-learn, scikit-image, numpy, matplotlib, Pillow
 
-#🎯Why This Project?
+🎯 #Why This Project?
 Demonstrates traditional ML (non-deep-learning) for face recognition.
 Educational: Clear workflow for beginners in computer vision.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
