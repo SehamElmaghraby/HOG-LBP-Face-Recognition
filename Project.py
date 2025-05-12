@@ -288,3 +288,92 @@ hog_clf = train_and_evaluate(X_train_hog_pca, X_test_hog_pca, y_train, y_test, "
 
 # Evaluate LBP features and save classifier (fix the missing assignment)
 lbp_clf = train_and_evaluate(X_train_lbp_pca, X_test_lbp_pca, y_train, y_test, "LBP")
+
+"""
+Cell 6
+Create visualizations and final report
+"""
+
+"""Display sample faces from dataset"""
+def plot_sample_faces(images, labels, title):
+    plt.figure(figsize=(12, 8))
+    for i in range(min(12, len(images))):  # Handle case with fewer than 12 images
+        plt.subplot(3, 4, i + 1)
+        plt.imshow(images[i], cmap=plt.cm.gray)
+        plt.title(target_names[labels[i]], size=10)
+        plt.xticks(())
+        plt.yticks(())
+    plt.suptitle(title, size=16)
+    plt.tight_layout()
+    plt.show()
+
+"""Compare computation times for feature extraction"""
+def compare_feature_times():
+    import time
+    
+    # Time HOG extraction
+    start = time.time()
+    _ = extract_hog_features(X_train[:10])
+    hog_time = time.time() - start
+    
+    # Time LBP extraction
+    start = time.time()
+    _ = extract_lbp_features(X_train[:10])
+    lbp_time = time.time() - start
+    
+    print(f"\nFeature Extraction Times (for 10 images):")
+    print(f"HOG: {hog_time:.4f} seconds")
+    print(f"LBP: {lbp_time:.4f} seconds")
+
+# Display sample faces
+plot_sample_faces(X_train, y_train, "Sample Faces from Data Set train")
+
+# Compare feature extraction times
+compare_feature_times()
+
+"""
+cell 7
+Prediction function and test
+"""
+
+"""Predict person's name from an image file"""
+def predict_person(image_path, classifier, pca, scaler, feature_type="HOG"):
+    try:
+        # Load and preprocess image
+        img = imread(image_path, as_gray=True)
+        
+        # Apply the same enhancement used during training
+        img = enhance_and_resize_image(img)
+        
+        # Extract features based on feature_type
+        if feature_type == "HOG":
+            features = extract_hog_features([img])
+        elif feature_type == "LBP":
+            features = extract_lbp_features([img])
+        else:
+            raise ValueError("feature_type must be either 'HOG' or 'LBP'")
+        
+        # Apply preprocessing (standardization and PCA)
+        features_scaled = scaler.transform(features)  # Now uses the scaler parameter
+        features_pca = pca.transform(features_scaled)  # Use the trained PCA
+        
+        # Predict
+        pred_label = classifier.predict(features_pca)[0]
+        return target_names[pred_label]
+
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return None
+
+# Example usage with the pre-trained classifier, scaler, and PCA
+test_image_path = r"path\to\test\image.jpg"
+# Now correctly passing all required parameters
+predicted_name_hog = predict_person(
+    test_image_path, 
+    hog_clf, 
+    pca_hog,
+    scaler_hog,
+    "HOG"
+)
+print(f"Predicted person (HOG): {predicted_name_hog}")
+
