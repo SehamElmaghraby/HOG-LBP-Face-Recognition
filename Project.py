@@ -197,3 +197,37 @@ visualize_lbp_features(X_train[15])
 print(f"LBP feature shape: {X_train_lbp.shape[1]} dimensions per image")
 
 
+
+"""
+Cell 4 
+ feature preprocessing pipeline
+"""
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# PCA parameters
+N_COMPONENTS = 150
+
+def preprocess_features(X_train, X_test):
+    """Standardize features and apply PCA"""
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    
+    pca = PCA(n_components=min(N_COMPONENTS, X_train_scaled.shape[1]), 
+              whiten=True, 
+              random_state=RANDOM_STATE)
+    X_train_pca = pca.fit_transform(X_train_scaled)
+    X_test_pca = pca.transform(X_test_scaled)
+    
+    return X_train_pca, X_test_pca, pca
+
+# Preprocess HOG features
+X_train_hog_pca, X_test_hog_pca, pca_hog = preprocess_features(X_train_hog, X_test_hog)
+
+# Preprocess LBP features
+X_train_lbp_pca, X_test_lbp_pca, pca_lbp = preprocess_features(X_train_lbp, X_test_lbp)
+
+print(f"After PCA - HOG features: {X_train_hog_pca.shape[1]} dimensions")
+print(f"After PCA - LBP features: {X_train_lbp_pca.shape[1]} dimensions")
