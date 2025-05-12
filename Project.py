@@ -1,5 +1,5 @@
 """
-Cell 1: 
+Cell 1 
 Load custom face dataset and prepare train/test splits
 """
 
@@ -12,7 +12,7 @@ from skimage import exposure
 # Constants
 RANDOM_STATE = 42
 TEST_SIZE = 0.25
-RESIZED_HEIGHT = 150  # Matches LFW default resize factor of 0.5 (original is 125x94),not anymore
+RESIZED_HEIGHT = 150  
 RESIZED_WIDTH = 112
 
 
@@ -85,7 +85,8 @@ print(f"Training set: {X_train.shape[0]} images")
 print(f"Test set: {X_test.shape[0]} images")
 
 """
-Cell 2:  Implement HOG feature extraction and visualization
+Cell 2
+Implement HOG feature extraction and visualization
 """
 
 from skimage.feature import hog
@@ -200,7 +201,7 @@ print(f"LBP feature shape: {X_train_lbp.shape[1]} dimensions per image")
 
 """
 Cell 4 
- feature preprocessing pipeline
+feature preprocessing pipeline
 """
 
 from sklearn.preprocessing import StandardScaler
@@ -231,3 +232,59 @@ X_train_lbp_pca, X_test_lbp_pca, pca_lbp = preprocess_features(X_train_lbp, X_te
 
 print(f"After PCA - HOG features: {X_train_hog_pca.shape[1]} dimensions")
 print(f"After PCA - LBP features: {X_train_lbp_pca.shape[1]} dimensions")
+
+
+"""
+Cell 5
+Implement classification and evaluation
+"""
+
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report 
+
+
+def train_and_evaluate(X_train, X_test, y_train, y_test, feature_type):
+    """Train SVM classifier and evaluate performance"""
+    print(f"\nEvaluating {feature_type} features...")
+    
+    # Train SVM
+    clf = SVC(kernel='rbf', class_weight='balanced', random_state=RANDOM_STATE)
+    clf.fit(X_train, y_train)
+    
+    # Evaluate
+    y_pred = clf.predict(X_test)
+    print(classification_report(y_test, y_pred, target_names=target_names,zero_division=0))
+    
+    # Return the trained classifier (this was missing)
+    return clf
+
+# Create global references to scalers and PCAs
+scaler_hog = StandardScaler()
+scaler_lbp = StandardScaler()
+
+# Standardize features before PCA
+X_train_hog_scaled = scaler_hog.fit_transform(X_train_hog)
+X_test_hog_scaled = scaler_hog.transform(X_test_hog)
+
+X_train_lbp_scaled = scaler_lbp.fit_transform(X_train_lbp)
+X_test_lbp_scaled = scaler_lbp.transform(X_test_lbp)
+
+# Apply PCA
+pca_hog = PCA(n_components=min(N_COMPONENTS, X_train_hog_scaled.shape[1]), 
+          whiten=True, random_state=RANDOM_STATE)
+X_train_hog_pca = pca_hog.fit_transform(X_train_hog_scaled)
+X_test_hog_pca = pca_hog.transform(X_test_hog_scaled)
+
+pca_lbp = PCA(n_components=min(N_COMPONENTS, X_train_lbp_scaled.shape[1]), 
+          whiten=True, random_state=RANDOM_STATE)
+X_train_lbp_pca = pca_lbp.fit_transform(X_train_lbp_scaled)
+X_test_lbp_pca = pca_lbp.transform(X_test_lbp_scaled)
+
+print(f"After PCA - HOG features: {X_train_hog_pca.shape[1]} dimensions")
+print(f"After PCA - LBP features: {X_train_lbp_pca.shape[1]} dimensions")
+
+# Evaluate HOG features and save classifier (fix the missing assignment)
+hog_clf = train_and_evaluate(X_train_hog_pca, X_test_hog_pca, y_train, y_test, "HOG")
+
+# Evaluate LBP features and save classifier (fix the missing assignment)
+lbp_clf = train_and_evaluate(X_train_lbp_pca, X_test_lbp_pca, y_train, y_test, "LBP")
