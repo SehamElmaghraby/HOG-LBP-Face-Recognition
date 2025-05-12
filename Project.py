@@ -142,3 +142,58 @@ visualize_hog_features(X_train[15])
 
 print(f"HOG feature shape: {X_train_hog.shape[1]} dimensions per image")
 
+
+
+"""
+Cell 3
+Implement LBP feature extraction and visualization
+"""
+
+from skimage.feature import local_binary_pattern
+
+# LBP parameters
+RADIUS = 3
+N_POINTS = 8 * RADIUS
+METHOD = 'uniform'
+
+def extract_lbp_features(images):
+    """Extract LBP features from images"""
+    lbp_features = []
+    for image in images:
+        
+        lbp = local_binary_pattern(image, N_POINTS, RADIUS, METHOD)
+        hist, _ = np.histogram(lbp.ravel(), 
+                              bins=np.arange(0, N_POINTS + 3),
+                              range=(0, N_POINTS + 2))
+        hist = hist.astype("float")
+        hist /= (hist.sum() + 1e-6)  # Normalize
+        lbp_features.append(hist)
+    return np.array(lbp_features)
+
+def visualize_lbp_features(image):
+    """Visualize LBP features for a sample image"""
+    lbp = local_binary_pattern(image, N_POINTS, RADIUS, METHOD)
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    
+    ax1.imshow(image, cmap=plt.cm.gray)
+    ax1.set_title('Input Image')
+    ax1.axis('off')
+    
+    ax2.imshow(lbp, cmap=plt.cm.gray)
+    ax2.set_title('LBP Features')
+    ax2.axis('off')
+    
+    plt.suptitle('Local Binary Patterns (LBP)')
+    plt.show()
+
+# Extract LBP features
+X_train_lbp = extract_lbp_features(X_train)
+X_test_lbp = extract_lbp_features(X_test)
+
+# Visualize for first training image
+visualize_lbp_features(X_train[15])
+
+print(f"LBP feature shape: {X_train_lbp.shape[1]} dimensions per image")
+
+
